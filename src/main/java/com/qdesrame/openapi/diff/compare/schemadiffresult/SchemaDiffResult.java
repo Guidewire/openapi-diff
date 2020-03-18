@@ -54,7 +54,23 @@ public class SchemaDiffResult {
         .setChangeFormat(!Objects.equals(left.getFormat(), right.getFormat()))
         .setReadOnly(new ChangedReadOnly(left.getReadOnly(), right.getReadOnly(), context))
         .setWriteOnly(new ChangedWriteOnly(left.getWriteOnly(), right.getWriteOnly(), context))
-        .setMaxLength(new ChangedMaxLength(left.getMaxLength(), right.getMaxLength(), context));
+        .setNullable(new ChangedNullable(left.getNullable(), right.getNullable(), context))
+        .setMinLength(new ChangedMinLength(left.getMinLength(), right.getMinLength(), context))
+        .setMaxLength(new ChangedMaxLength(left.getMaxLength(), right.getMaxLength(), context))
+        .setMinimum(new ChangedMinimum(left.getMinimum(), right.getMinimum(), context))
+        .setExclusiveMinimum(
+            new ChangedExclusiveMinimum(
+                left.getExclusiveMinimum(), right.getExclusiveMinimum(), context))
+        .setMaximum(new ChangedMaximum(left.getMaximum(), right.getMaximum(), context))
+        .setExclusiveMaximum(
+            new ChangedExclusiveMaximum(
+                left.getExclusiveMaximum(), right.getExclusiveMaximum(), context))
+        .setMultipleOf(new ChangedMultipleOf(left.getMultipleOf(), right.getMultipleOf(), context))
+        .setMinItems(new ChangedMinItems(left.getMinItems(), right.getMinItems(), context))
+        .setMaxItems(new ChangedMaxItems(left.getMaxItems(), right.getMaxItems(), context))
+        .setUniqueItems(
+            new ChangedUniqueItems(left.getUniqueItems(), right.getUniqueItems(), context))
+        .setPattern(new ChangedPattern(left.getPattern(), right.getPattern(), context));
 
     openApiDiff
         .getExtensionsDiff()

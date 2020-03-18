@@ -32,8 +32,19 @@ public class ChangedSchema implements ComposedChanged {
   protected boolean changeFormat;
   protected ChangedReadOnly readOnly;
   protected ChangedWriteOnly writeOnly;
+  protected ChangedNullable nullable;
   protected boolean changedType;
+  protected ChangedMinLength minLength;
   protected ChangedMaxLength maxLength;
+  protected ChangedMinimum minimum;
+  protected ChangedExclusiveMinimum exclusiveMinimum;
+  protected ChangedMaximum maximum;
+  protected ChangedExclusiveMaximum exclusiveMaximum;
+  protected ChangedMultipleOf multipleOf;
+  protected ChangedPattern pattern;
+  protected ChangedMinItems minItems;
+  protected ChangedMaxItems maxItems;
+  protected ChangedUniqueItems uniqueItems;
   protected boolean discriminatorPropertyChanged;
   protected ChangedSchema items;
   protected ChangedOneOfSchema oneOfSchema;
@@ -54,12 +65,23 @@ public class ChangedSchema implements ComposedChanged {
                 description,
                 readOnly,
                 writeOnly,
+                nullable,
                 items,
                 oneOfSchema,
                 addProp,
                 enumeration,
                 required,
+                minLength,
                 maxLength,
+                minimum,
+                exclusiveMinimum,
+                maximum,
+                exclusiveMaximum,
+                multipleOf,
+                pattern,
+                minItems,
+                maxItems,
+                uniqueItems,
                 extensions))
         .collect(Collectors.toList());
   }
@@ -73,7 +95,8 @@ public class ChangedSchema implements ComposedChanged {
         && missingProperties.size() == 0
         && changedProperties.values().size() == 0
         && !changeDeprecated
-        && !discriminatorPropertyChanged) {
+        && !discriminatorPropertyChanged
+        && !changeDefault) {
       return DiffResult.NO_CHANGES;
     }
     boolean compatibleForRequest = (oldSchema != null || newSchema == null);
@@ -85,6 +108,7 @@ public class ChangedSchema implements ComposedChanged {
         && !discriminatorPropertyChanged) {
       return DiffResult.COMPATIBLE;
     }
+    // TODO - AHK - Should changeDefault ever be incompatible?
     return DiffResult.INCOMPATIBLE;
   }
 }
