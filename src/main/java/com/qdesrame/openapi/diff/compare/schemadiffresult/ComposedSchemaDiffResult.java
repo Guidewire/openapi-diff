@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 
 /** Created by adarsh.sharma on 20/12/17. */
@@ -96,7 +96,22 @@ public class ComposedSchemaDiffResult extends SchemaDiffResult {
   }
 
   private Map<String, String> getMapping(ComposedSchema composedSchema) {
-    Map<String, String> reverseMapping = new LinkedHashMap<>();
+    Set<String> explicitlyMappedReferences = new HashSet<>();
+    Map<String, String> composedMapping = new LinkedHashMap<>();
+
+    // Start with any explicitly-defined mappings
+    if (composedSchema.getDiscriminator().getMapping() != null) {
+      composedSchema
+          .getDiscriminator()
+          .getMapping()
+          .forEach(
+              (key, value) -> {
+                composedMapping.put(key, value);
+                explicitlyMappedReferences.add(value);
+              });
+    }
+
+    // Add implicit mappings for any types not referenced via explicit mappings
     for (Schema schema : composedSchema.getOneOf()) {
       String ref = schema.get$ref();
       if (ref == null) {
@@ -106,16 +121,12 @@ public class ComposedSchemaDiffResult extends SchemaDiffResult {
       if (schemaName == null) {
         throw new IllegalArgumentException("invalid schema: " + ref);
       }
-      reverseMapping.put(ref, schemaName);
-    }
 
-    if (composedSchema.getDiscriminator().getMapping() != null) {
-      for (String ref : composedSchema.getDiscriminator().getMapping().keySet()) {
-        reverseMapping.put(composedSchema.getDiscriminator().getMapping().get(ref), ref);
+      if (!explicitlyMappedReferences.contains(ref)) {
+        composedMapping.put(schemaName, ref);
       }
     }
 
-    return reverseMapping.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+    return composedMapping;
   }
 }
